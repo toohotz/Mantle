@@ -20,9 +20,9 @@ extension MTLJSONSerializing {
 	- parameter JSONData          The JSON dictionary to deserialize.
 	- parameter dictionaryKeyPath The dictionary keypath to parse for the object model.
 
-	- returns: Returns an MTLJSONSerializing object that can be casted to the final model type for type inference.
+	- returns: Returns an optional MTLJSONSerializing object that can be casted to the final model type for type inference.
 	*/
-	static func deserializeGenericModelFromJSONDictionary<T: MTLJSONSerializing>(JSONData: [NSObject : AnyObject]?, dictionaryKeyPath: String!) -> T
+	static func deserializeGenericModelFromJSONDictionary<T: MTLJSONSerializing>(JSONData: [NSObject : AnyObject]?, dictionaryKeyPath: String!) -> T?
 	{
 		var modelData: T?
 		do {
@@ -34,6 +34,6 @@ extension MTLJSONSerializing {
 		{
 
 		}
-		return modelData!
+		return modelData
 	}
 }
