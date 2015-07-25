@@ -15,25 +15,42 @@ extension MTLJSONSerializing {
 
 	Example
 	```swift
-	let deserializedModelFromJSON = MyModel.deserializedGenericModelFromJSONDictionary(receivedData as? [NSObject : AnyObject], dictionaryKeyPath: "myKeyPath") as MyModel
+	let deserializedModelFromJSON = myModel.deserializedGenericModelFromJSONDictionary(receivedData as? [NSObject : AnyObject], dictionaryKeyPath: "myKeyPath") as MyModel
 	```
 	- parameter JSONData          The JSON dictionary to deserialize.
 	- parameter dictionaryKeyPath The dictionary keypath to parse for the object model.
 
-	- returns: Returns an optional MTLJSONSerializing object that can be casted to the final model type for type inference.
+	- returns: Returns a MTLJSONSerializing object that can be casted to the final model type for type inference.
 	*/
-	static func deserializeGenericModelFromJSONDictionary<T: MTLJSONSerializing>(JSONData: [NSObject : AnyObject]?, dictionaryKeyPath: String!) -> T?
+	static func deserializeGenericModelFromJSONDictionary<T: MTLJSONSerializing>(JSONData: [NSObject : AnyObject]?, dictionaryKeyPath: String?) -> T
 	{
 		var modelData: T?
 		do {
-			modelData = try MTLJSONAdapter.modelOfClass(T.self, fromJSONDictionary: JSONData![dictionaryKeyPath] as! [NSObject : AnyObject]) as? T
+			if let dictKeyPath = dictionaryKeyPath {
+				modelData = try MTLJSONAdapter.modelOfClass(T.self, fromJSONDictionary: JSONData![dictKeyPath] as! [NSObject : AnyObject]) as? T
+			} else {
+				modelData = try MTLJSONAdapter.modelOfClass(T.self, fromJSONDictionary: JSONData! as [NSObject : AnyObject]) as? T
+			}
 		} catch let error as NSError {
 			print("An error occured creating a model for the object \(error.localizedDescription)", appendNewline: true)
 		}
-		catch
-		{
+		return modelData!
+	}
 
-		}
-		return modelData
+	/**
+	Deserializes a JSON array of dictionary objects into a generic MTLJSONSerializing model that conforms to the MTLJSONSerializing protocol generic type.
+
+	Example
+	``` swift
+	let myModel = myModelClass.deserializeGenericModelFromJSONArray(receivedData) as myModelClass
+	```
+
+	- parameter JSONData          An array of JSON dictionary objects.
+
+	- returns: A  MTLJSONSerializing object that can be casted to the final model type for type inference.
+	*/
+	static func deserializeGenericModelFromJSONArray<T: MTLJSONSerializing>(JSONData: AnyObject?) -> T
+	{
+		return self.deserializeGenericModelFromJSONDictionary(JSONData as? [String : AnyObject], dictionaryKeyPath: nil)
 	}
 }
